@@ -24,7 +24,7 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     service = TaskService(TaskRepository(db))
     return service.create_task(task.title)
 
-@router.put("/{task_id}/complete")
+@router.put("/{task_id}/complete", response_model=TaskResponse)
 def complete_task(task_id: int, db: Session = Depends(get_db)):
     service = TaskService(TaskRepository(db))
     return service.complete_task(task_id)

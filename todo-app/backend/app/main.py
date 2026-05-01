@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.controllers.task_controller import router
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,

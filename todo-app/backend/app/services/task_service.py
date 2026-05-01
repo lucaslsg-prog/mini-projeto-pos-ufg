@@ -1,4 +1,6 @@
 from app.repositories.task_repository import TaskRepository
+from fastapi import HTTPException
+
 
 class TaskService:
 
@@ -12,7 +14,15 @@ class TaskService:
         return self.repository.create(title)
 
     def complete_task(self, task_id: int):
-        return self.repository.complete(task_id)
+        task = self.repository.complete(task_id)
+
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        return task
 
     def delete_task(self, task_id: int):
-        self.repository.delete(task_id)
+        deleted = self.repository.delete(task_id)
+
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Task not found")

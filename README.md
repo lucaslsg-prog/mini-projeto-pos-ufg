@@ -4,9 +4,10 @@ Este projeto implementa uma **micro API de gerenciamento de tarefas (to-do list)
 
 - ✅ **Backend FastAPI rodando em Docker**
 - ✅ **PostgreSQL em container Docker**
+- ✅ **Pytest em container Docker**
 - ✅ **Frontend React rodando localmente**
 
-O objetivo desta versão é garantir **ambiente reproduzível**, facilidade de setup e maior proximidade com cenários reais de produção.
+O objetivo desta versão é garantir **ambiente reproduzível**, facilidade de setup e maior proximidade com cenários reais de produção executando suite de teste de forma pratica.
 
 ---
 
@@ -25,6 +26,9 @@ O objetivo desta versão é garantir **ambiente reproduzível**, facilidade de s
 - Vite
 - Axios
 
+### Tests
+- Pytest
+
 ### Infraestrutura
 - Docker
 - Docker Compose
@@ -37,6 +41,7 @@ O objetivo desta versão é garantir **ambiente reproduzível**, facilidade de s
 todo-app/
 │
 ├── backend/
+|   |
 │   ├── app/
 │   │   ├── main.py
 │   │   ├── database.py
@@ -50,7 +55,11 @@ todo-app/
 │   │   │   └── task_controller.py
 │   │   └── schemas/
 │   │       └── task_schema.py
-│   │
+|   |
+|   ├── tests/
+│   │   ├── conftest.py
+│   │   └──  test_task.py
+|   |
 │   ├── requirements.txt
 │   ├── Dockerfile
 │   └── .env
@@ -76,8 +85,6 @@ Nesta versão, **PostgreSQL e Backend FastAPI são executados juntos via Docker 
 ### Arquivo `docker-compose.yml`
 
 ```yaml
-version: "3.8"
-
 services:
   postgres:
     image: postgres
@@ -102,7 +109,11 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend/app:/app/app
+      - ./backend:/app   # run app + tests
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 volumes:
   postgres_data:
@@ -197,6 +208,27 @@ O CORS já está configurado no backend para permitir acesso do frontend.
 
 ---
 
+## 🧪 Testes automatizados (pytest)
+
+O projeto possui testes automatizados utilizando **pytest** para validar o comportamento da API.
+
+Os testes cobrem:
+
+- ✅ criação de tarefas  
+- ✅ listagem de tarefas  
+- ✅ conclusão de tarefas  
+- ✅ remoção de tarefas  
+- ✅ cenários de erro (404 – task não encontrada)  
+
+---
+
+### ▶️ Como executar os testes
+
+Com o ambiente rodando via Docker:
+
+```bash
+docker-compose exec backend pytest -v
+
 ## ✅ Funcionalidades
 
 - Criar tarefas
@@ -226,4 +258,4 @@ O CORS já está configurado no backend para permitir acesso do frontend.
 
 ## 👨‍💻 Autor
 
-Projeto desenvolvido para fins de estudo e prática com FastAPI, Docker, PostgreSQL e React para criar experiencia com desenvolvimento de software assistido por IA na pós graduação da UFG.
+Projeto desenvolvido para fins de estudo e prática com FastAPI, Docker, PostgreSQL, React e Pytest para criar experiencia com desenvolvimento de software assistido por IA na pós graduação da UFG.
